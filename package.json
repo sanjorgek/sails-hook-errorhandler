@@ -1,0 +1,26 @@
+{
+  "name": "sails-hook-sanehandler",
+  "version": "1.0.0",
+  "description": "A sails hook for errors",
+  "main": "errorHandler/index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sanjorgek/sails-hook-errorhandler.git"
+  },
+  "keywords": [
+    "sails",
+    "hook",
+    "error",
+    "handler",
+    "wrapper"
+  ],
+  "author": "sanjorgek",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sanjorgek/sails-hook-errorhandler/issues"
+  },
+  "homepage": "https://github.com/sanjorgek/sails-hook-errorhandler#readme"
+}
