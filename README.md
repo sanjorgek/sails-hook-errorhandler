@@ -8,6 +8,8 @@
   [![bitHound Dev Dependencies][devdep-image]][devdep-url]
   [![bitHound Code][code-image]][code-url]
   [![Codacy Badge][codacy-image]][codacy-url]
+  [![Code Climate](https://codeclimate.com/github/sanjorgek/sails-hook-errorhandler/badges/gpa.svg)](https://codeclimate.com/github/sanjorgek/sails-hook-errorhandler)
+  [![Issue Count](https://codeclimate.com/github/sanjorgek/sails-hook-errorhandler/badges/issue_count.svg)](https://codeclimate.com/github/sanjorgek/sails-hook-errorhandler)
 
 ## About
 A sails hook for errors.
