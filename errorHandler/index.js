@@ -102,8 +102,8 @@ module.exports = function (sails) {
               var response = matchModels[1];
               var model = matchModels[2];
               var isDefaultResponse = model == '';
-              var message = isDefaultResponse? null : internalErrors.messages[response](model);
-              var code = isDefaultResponse? '00' : internalErrors.modelCodes[model];
+              var message = isDefaultResponse? null : sails.config.errorhandler.messages[response](model);
+              var code = isDefaultResponse? '00' : sails.config.errorhandler.modelCodes[model];
 
               return {
                 codeString: response,
@@ -121,7 +121,7 @@ module.exports = function (sails) {
 
             // Error realted to server
             var matchServer = serverError.exec(error.codeString);
-            var partialError = internalErrors.messages.serverError(error.codeString);
+            var partialError = sails.config.errorhandler.messages.serverError(error.codeString);
             partialError.detailedInfo = error.detailedInfo;
             partialError.codeString = "serverError";
 
@@ -134,7 +134,7 @@ module.exports = function (sails) {
           },
 
           buildError: function (error) {
-            var defaultError = internalErrors.defaults[error.codeString];
+            var defaultError = sails.config.errorhandler.defaults[error.codeString];
             var json = { error: {
                 code: defaultError.code,
                 message: error.errorString? error.errorString : defaultError.message,
@@ -150,7 +150,7 @@ module.exports = function (sails) {
           },
 
           respond: function (error, res) {
-            var responseError = sails.services.errorhandler.compose(error);
+            var responseError = sails.hooks.errorhandler.compose(error);
             var response = res[responseError.codeString];
 
             if (!response) {
@@ -159,7 +159,7 @@ module.exports = function (sails) {
             }
 
             sails.log.error('services:errorHandler', "RAISED: " + error.codeString + ". Details: " + JSON.stringify(error.detailedInfo));
-            var properError = sails.services.errorhandler.buildError(responseError);
+            var properError = sails.hooks.errorhandler.buildError(responseError);
             return response(properError);
           }
         }
