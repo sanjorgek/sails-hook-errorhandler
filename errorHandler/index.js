@@ -2,73 +2,29 @@
  * errorHandler hook
  */
 
+var defaults = require('./defaults');
+
+var messages = require('./messages');
+
 module.exports = function (sails) {
   return {
     
-    defaults: {
-      messages: {
-        unauthorized: function (model) {
-          return "Unuathorized " + model
-        },
+    //defaults: {},
 
-        notFound: function (model) {
-          return model + " not found"
-        },
+    configure: function(){
+      if(!sails.config.errorhandler){
+        sails.config.errorhandler = {
+          messages: messages,
 
-        invalid: function (model) {
-          return "Can't process request due invalid " + model
-        },
+          defaults: defaults
+        }
+      }
+      if(sails.config.errorhandler.modelCodes){
+        sails.config.errorhandler.messages = messages;
 
-        conflict: function (model) {
-          return "Conflict with " + model
-        },
-
-        forbidden: function (model) {
-          return "Invalid authorization for " + model
-        },
-
-        serverError: function (codeString) {
-          switch (codeString) {
-            case "dataBaseError":
-              return { icode: "01"}
-            case "communicationError":
-              return { errorString: "Communication error", icode: "02" }
-            case "communicationUnexpectedStatus":
-              return { errorString: "Communication Unexpected Status", icode: "03" }
-            default:
-              return { icode: "00" }
-          }
-        },
-      },
-
-      defaults: {
-        badRequest: { message: "Bad Request", code: "400-00"},
-
-        conflict: { message: "Conflict with the data", code: "409"},
-
-        forbidden: { message: "Forbidden action", code: "403"},
-
-        invalid: { message: "Invalid params", code: "422"},
-
-        missingArguments: { message: "Missing Arguments", code: "400-01"},
-
-        notAcceptable: { message: "Invalid Content-Type", code: "406-00"},
-
-        notFound: { message: "Route not found", code: "404"},
-
-        notImplemented: { message: "Can't fulfill the request", code: "501-00"},
-
-        serverError: { message: "Server Error", code: "500"},
-
-        serviceUnavailable: { message: "Service Unavailable", code: "503-00"},
-
-        unauthorized: { message: "Unauthorized", code: "401"},
-
-        unsupportedMediaType: { message: "Invalid Content-Type", code: "415-00"}
+        sails.config.errorhandler.defaults= defaults;
       }
     },
-
-    //configure: function(){},
 
     //routes: {
       //before: {},
@@ -150,7 +106,7 @@ module.exports = function (sails) {
           },
 
           respond: function (error, res) {
-            var responseError = sails.hooks.errorhandler.compose(error);
+            var responseError = sails.errorhandler.compose(error);
             var response = res[responseError.codeString];
 
             if (!response) {
@@ -159,7 +115,7 @@ module.exports = function (sails) {
             }
 
             sails.log.error('services:errorHandler', "RAISED: " + error.codeString + ". Details: " + JSON.stringify(error.detailedInfo));
-            var properError = sails.hooks.errorhandler.buildError(responseError);
+            var properError = sails.errorhandler.buildError(responseError);
             return response(properError);
           }
         }
