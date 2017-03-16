@@ -16,6 +16,23 @@ A sails hook for errors.
 
   [![NPM][graph-image]][graph-url]
 
+## Settings
+Install
+
+```
+npm install sails-hook-errorhandler
+```
+
+Define at `config/seed.js`
+
+```js
+module.exports.errorhandler = {
+  modelCodes: {
+    User: "11" //some model and some code
+  }
+}
+```
+
 [npm-image]: https://img.shields.io/npm/v/sails-hook-errorhandler.svg
 [npm-url]: https://npmjs.org/package/sails-hook-errorhandler
 [downloads-image]: https://img.shields.io/npm/dm/sails-hook-errorhandler.svg
