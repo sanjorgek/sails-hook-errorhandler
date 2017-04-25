@@ -40,10 +40,6 @@ module.exports = function (sails) {
             errorCreated.codeString = codeString;
             errorCreated.detailedInfo = detailedInfo;
 
-            if(codeString === "serverError"){
-              sails.log.error('services:errorHandler', "SERVER ERROR:: " + detailedInfo);
-            }
-
             return errorCreated;
           },
 
@@ -81,11 +77,6 @@ module.exports = function (sails) {
             partialError.detailedInfo = error.detailedInfo;
             partialError.codeString = "serverError";
 
-            // Error did not match responses
-            if (!matchServer) {
-              sails.log.error('services:errorHandler', error.codeString + " not found in ErrorHandler");
-            }
-
             return partialError;
           },
 
@@ -110,11 +101,8 @@ module.exports = function (sails) {
             var response = res[responseError.codeString];
 
             if (!response) {
-              sails.log.error('services:errorHandler', responseError.codeString + " not found. Returning default error");
               return res.serverError("Default option code string");
             }
-
-            sails.log.error('services:errorHandler', "RAISED: " + error.codeString + ". Details: " + JSON.stringify(error.detailedInfo));
             var properError = sails.errorhandler.buildError(responseError);
             return response(properError);
           }
