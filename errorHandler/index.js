@@ -1,36 +1,45 @@
 /**
  * errorHandler hook
  */
-
-var defaults = require('./defaults');
-
-var messages = require('./messages');
+ var defaults = require("./defaults");
+ var messages = require("./messages");
+/* uses lodash from sails */
+/*global _*/
 
 module.exports = function (sails) {
   return {
-    
+
     //defaults: {},
 
     configure: function(){
-      if(!sails.config.errorhandler){
-        sails.config.errorhandler = {
-          messages: messages,
+      _.extend(sails.config.errorhandler, {});
+      // explore config
+      var defaultConfig = {
+        messages: messages,
+        defaults: defaults,
+        modelErrors: /^(unauthorized|notFound|invalid|conflict|forbidden)(.*)$/,
+        soloErrors: /^(badRequest|missingArguments|notAcceptable|notImplemented|serviceUnavailable|unsupportedMediaType)$/,
+        serverError: /^(dataBaseError|communicationUnexpectedStatus|communicationError|serverError)$/
+      };
 
-          defaults: defaults
+      _.keys(defaultConfig).forEach(function (k) {
+        if (!sails.config.errorhandler[k]) {
+          sails.config.errorhandler[k] = defaultConfig[k];
         }
-      }
-      if(sails.config.errorhandler.modelCodes){
-        sails.config.errorhandler.messages = messages;
-
-        sails.config.errorhandler.defaults= defaults;
-      }
+      });
+      // overwrite from config
+      _.extend(messages, sails.config.errorhandler.messages);
+      _.extend(defaults, sails.config.errorhandler.defaults);
+      // add config
+      _.extend(sails.config.errorhandler.messages, messages);
+      _.extend(sails.config.errorhandler.defaults, defaults);
     },
 
     //routes: {
       //before: {},
       //after: {},
     //}
-    
+
     // Run when sails loads-- be sure and call `next()`.
     initialize: function (next) {
       sails.after(["hook:policies:loaded"], function(){
@@ -44,18 +53,14 @@ module.exports = function (sails) {
           },
 
           compose: function (error) {
-            var modelErrors = /^(unauthorized|notFound|invalid|conflict|forbidden)(.*)$/;
-            var soloErrors = /^(badRequest|missingArguments|notAcceptable|notImplemented|serviceUnavailable|unsupportedMediaType)$/;
-            var serverError = /^(dataBaseError|communicationUnexpectedStatus|communicationError|serverError)$/;
-
             // Error related to model
-            var matchModels = modelErrors.exec(error.codeString);
+            var matchModels = sails.config.errorhandler.modelErrors.exec(error.codeString);
             if (matchModels) {
               var response = matchModels[1];
               var model = matchModels[2];
-              var isDefaultResponse = model == '';
+              var isDefaultResponse = model === "";
               var message = isDefaultResponse? null : sails.config.errorhandler.messages[response](model);
-              var code = isDefaultResponse? '00' : sails.config.errorhandler.modelCodes[model];
+              var code = isDefaultResponse? "00" : sails.config.errorhandler.modelCodes[model];
 
               return {
                 codeString: response,
@@ -66,13 +71,13 @@ module.exports = function (sails) {
             }
 
             // Error not realated to model
-            var matchSolo = soloErrors.exec(error.codeString);
+            var matchSolo = sails.config.errorhandler.soloErrors.exec(error.codeString);
             if (matchSolo) {
               return error;
             }
 
             // Error realted to server
-            var matchServer = serverError.exec(error.codeString);
+            var matchServer = sails.config.errorhandler.serverError.exec(error.codeString);
             var partialError = sails.config.errorhandler.messages.serverError(error.codeString);
             partialError.detailedInfo = error.detailedInfo;
             partialError.codeString = "serverError";
@@ -82,6 +87,13 @@ module.exports = function (sails) {
 
           buildError: function (error) {
             var defaultError = sails.config.errorhandler.defaults[error.codeString];
+            if (!defaultError) {
+              defaultError = {
+                code: "500",
+                message: "Default error"
+              };
+            }
+
             var json = { error: {
                 code: defaultError.code,
                 message: error.errorString? error.errorString : defaultError.message,

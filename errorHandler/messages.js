@@ -30,5 +30,5 @@ module.exports = {
       default:
         return { icode: "00" }
     }
-  },
+  }
 };
