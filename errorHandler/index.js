@@ -33,7 +33,7 @@ module.exports = function (sails) {
     
     // Run when sails loads-- be sure and call `next()`.
     initialize: function (next) {
-      sails.after(["hook:orm:loaded", "hook:policies:loaded"], function(){
+      sails.after(["hook:policies:loaded"], function(){
         sails.errorhandler = {
           create: function (codeString, detailedInfo) {
             var errorCreated = new Error();
