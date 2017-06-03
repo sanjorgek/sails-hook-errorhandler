@@ -53,6 +53,18 @@ module.exports = function (sails) {
           },
 
           compose: function (error) {
+            // Error not related to model
+            var matchSolo = sails.config.errorhandler.soloErrors.exec(error.codeString);
+            if (matchSolo) {
+              return error;
+            }
+
+            // Error related to server
+            var matchServer = sails.config.errorhandler.serverError.exec(error.codeString);
+            var partialError = sails.config.errorhandler.messages.serverError(error.codeString);
+            partialError.detailedInfo = error.detailedInfo;
+            partialError.codeString = "serverError";
+
             // Error related to model
             var matchModels = sails.config.errorhandler.modelErrors.exec(error.codeString);
             if (matchModels) {
@@ -70,17 +82,6 @@ module.exports = function (sails) {
               }
             }
 
-            // Error not realated to model
-            var matchSolo = sails.config.errorhandler.soloErrors.exec(error.codeString);
-            if (matchSolo) {
-              return error;
-            }
-
-            // Error realted to server
-            var matchServer = sails.config.errorhandler.serverError.exec(error.codeString);
-            var partialError = sails.config.errorhandler.messages.serverError(error.codeString);
-            partialError.detailedInfo = error.detailedInfo;
-            partialError.codeString = "serverError";
 
             return partialError;
           },
