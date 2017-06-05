@@ -1,6 +1,6 @@
 {
   "name": "sails-hook-errorhandler",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A sails hook for errors",
   "main": "errorHandler/index.js",
   "sails": {
