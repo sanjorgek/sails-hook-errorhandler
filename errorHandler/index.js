@@ -44,10 +44,11 @@ module.exports = function (sails) {
     initialize: function (next) {
       sails.after(["hook:policies:loaded"], function(){
         sails.errorhandler = {
-          create: function (codeString, detailedInfo) {
+          create: function (codeString, detailedInfo, icode) {
             var errorCreated = new Error();
             errorCreated.codeString = codeString;
             errorCreated.detailedInfo = detailedInfo;
+            errorCreated.icode = icode;
 
             return errorCreated;
           },
@@ -72,16 +73,18 @@ module.exports = function (sails) {
               var model = matchModels[2];
               var isDefaultResponse = model === "";
               var message = isDefaultResponse? null : sails.config.errorhandler.messages[response](model);
-              var code = isDefaultResponse? "00" : sails.config.errorhandler.modelCodes[model];
-
-              return {
+              var modelError = {
                 codeString: response,
                 errorString: message,
-                icode: code,
                 detailedInfo: error.detailedInfo
+              };
+              if(!isDefaultResponse){
+                modelError.icode = sails.config.errorhandler.modelCodes[model];
+              }else if(error.icode){
+                modelError.icode = error.icode;
               }
+              return modelError;
             }
-
 
             return partialError;
           },
@@ -94,8 +97,8 @@ module.exports = function (sails) {
                 message: "Default error"
               };
             }
-
-            var json = { error: {
+            var json = {
+              error: {
                 code: defaultError.code,
                 message: error.errorString? error.errorString : defaultError.message,
                 detailedInfo: error.detailedInfo
@@ -104,6 +107,10 @@ module.exports = function (sails) {
 
             if (error.icode) {
               json.error.code += "-" + error.icode;
+            }else if(defaultError.icode) {
+              json.error.code += "-" + error.icode;
+            } else{
+              json.error.code += "-00";
             }
 
             return json;

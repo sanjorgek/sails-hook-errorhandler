@@ -28,8 +28,8 @@ var should = require("should");
                 },
 
                 defaults: {
-                  gone: { message: "Service Gone", code: "410-00"},
-                  badRequest: {message: "my bad requeste message", code: "400-00"}
+                  gone: { message: "Service Gone", code: "410"},
+                  badRequest: {message: "my bad requeste message", code: "400"}
                 },
 
                 soloErrors: /^(badRequest|missingArguments|notAcceptable|notImplemented|serviceUnavailable|unsupportedMediaType|gone)$/
@@ -132,7 +132,7 @@ var should = require("should");
             var properError = sails.errorhandler.buildError(error);
             properError.should.have.property("error");
             properError.error.should.have.property("detailedInfo", "detailedInfo");
-            properError.error.should.have.property("code", "401");
+            properError.error.should.have.property("code", "401-00");
             properError.error.should.have.property("message", "Unauthorized model");
             done();
         });
@@ -157,7 +157,17 @@ var should = require("should");
         it("creates an error with default intern code", function (done){
             var errorCreated = sails.errorhandler.create("unauthorized","detailedInfo");
             var toResponse = sails.errorhandler.compose(errorCreated);
-            toResponse.should.have.property("icode", "00");
+            should.not.exist(toResponse.icode);
+            toResponse.should.have.property("detailedInfo", "detailedInfo");
+            toResponse.should.have.property("errorString", null);
+            toResponse.should.have.property("codeString", "unauthorized");
+            done();
+        });
+
+        it("creates an error with specified intern code", function (done){
+            var errorCreated = sails.errorhandler.create("unauthorized","detailedInfo","XX");
+            var toResponse = sails.errorhandler.compose(errorCreated);
+            toResponse.should.have.property("icode", "XX");
             toResponse.should.have.property("detailedInfo", "detailedInfo");
             toResponse.should.have.property("errorString", null);
             toResponse.should.have.property("codeString", "unauthorized");
