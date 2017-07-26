@@ -1,6 +1,6 @@
 module.exports = {
   unauthorized: function (model) {
-    return "Unuathorized " + model
+    return "Unauthorized " + model
   },
 
   notFound: function (model) {

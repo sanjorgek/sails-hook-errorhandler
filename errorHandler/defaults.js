@@ -7,7 +7,7 @@ module.exports = {
 
   invalid: { message: "Invalid params", code: "422"},
 
-  missingArguments: { message: "Missing Arguments", code: "400", idcode:"01"},
+  missingArguments: { message: "Missing Arguments", code: "400", icode:"01"},
 
   notAcceptable: { message: "Invalid Content-Type", code: "406"},
 

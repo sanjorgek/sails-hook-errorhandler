@@ -108,7 +108,7 @@ module.exports = function (sails) {
             if (error.icode) {
               json.error.code += "-" + error.icode;
             }else if(defaultError.icode) {
-              json.error.code += "-" + error.icode;
+              json.error.code += "-" + defaultError.icode;
             } else{
               json.error.code += "-00";
             }
