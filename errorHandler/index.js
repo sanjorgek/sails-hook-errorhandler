@@ -45,7 +45,9 @@ module.exports = function (sails) {
       sails.after(["hook:policies:loaded"], function(){
         sails.errorhandler = {
           create: function (codeString, detailedInfo, icode) {
-            var errorCreated = new Error();
+            var detailString = (typeof detailedInfo === "object")? JSON.stringify(detailedInfo) : detailedInfo;
+            var message = codeString + " " + detailString.substring(0,150);
+            var errorCreated = new Error(message);
             errorCreated.codeString = codeString;
             errorCreated.detailedInfo = detailedInfo;
             errorCreated.icode = icode;
