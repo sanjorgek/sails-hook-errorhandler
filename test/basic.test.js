@@ -62,6 +62,7 @@ var should = require("should");
             var errorCreated = sails.errorhandler.create("missingArguments","detailedInfo");
             errorCreated.should.have.property("codeString","missingArguments");
             errorCreated.should.have.property("detailedInfo","detailedInfo");
+            errorCreated.should.have.property("message","missingArguments detailedInfo");
             done();
         });
     });
